@@ -5,9 +5,9 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Subset
 import numpy as np
 
-from src.model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
+from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
-from src.datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
+from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 
 MODEL_PATH = "best_model_v1.pth"
 OUTPUT_PATH = "model_outputs/model_output_v01.npy"

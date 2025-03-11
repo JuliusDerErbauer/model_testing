@@ -8,9 +8,9 @@ import torch.optim as optim
 import torch
 from tqdm import tqdm
 
-from src.datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
-from src.data_prerepration.noise_augmentation import NoiseAugmentation
-from src.model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
+from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
+from data_prerepration.noise_augmentation import NoiseAugmentation
+from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
 MODEL_PATH = "wheights/best_model_v3.pth"
 
