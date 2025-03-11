@@ -12,7 +12,7 @@ from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
-MODEL_PATH = "/Users/julianheines/PycharmProjects/model_testing/wheights/next_step_model_v0.pth"
+MODEL_PATH = "/Users/julianheines/PycharmProjects/model_testing/wheights/next_step_model_v2.pth"
 
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     data_augmentation_pipeline = NoiseAugmentation()
 
     dataset = GripperTimeSeriesDataset(
-        "/Users/julianheines/PycharmProjects/object_deformation/src/data/generated/training_data_linear_random",
+        "data/training_data_linear_random",
         transform=data_augmentation_pipeline
     )
 
@@ -101,10 +101,10 @@ if __name__ == "__main__":
     train_subset = Subset(train_subset, subset_indices)
 
     val_subset = Subset(dataset, val_indices)
-    subset_indices = torch.randperm(len(train_subset))[:60]
+    subset_indices = torch.randperm(len(train_subset))[:100]
     val_subset = Subset(val_subset, subset_indices)
 
-    train_dataloader = DataLoader(train_subset, batch_size=100, shuffle=True)
+    train_dataloader = DataLoader(train_subset, batch_size=20, shuffle=True)
     val_dataloader = DataLoader(val_subset, batch_size=20, shuffle=False)
 
     model = SimplePointnet2Autoencoder()
@@ -114,4 +114,4 @@ if __name__ == "__main__":
     criterion = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
-    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=2)
+    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=10)
