@@ -1,7 +1,6 @@
 import os.path
 
 from torch.utils.data.dataloader import DataLoader
-from torchvision import transforms
 from sklearn.model_selection import train_test_split
 from torch import nn
 import torch.optim as optim
@@ -43,7 +42,6 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             scheduler.step()
 
             running_loss += loss.item()
-            print(f"Running loss: {running_loss}")
 
         avg_train_loss = running_loss / len(train_dataloader)  # Average training loss
         print(f"Train Loss: {avg_train_loss:.4f}")
@@ -86,9 +84,7 @@ if __name__ == "__main__":
         device = "cpu"
     device = torch.device(device)
 
-    data_augmentation_pipeline = transforms.Compose(
-        [NoiseAugmentation()]
-    )
+    data_augmentation_pipeline = NoiseAugmentation()
 
     dataset = GripperSingleFrameDataset(
         "data/random_data_0.npy",
