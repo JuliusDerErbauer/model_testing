@@ -36,4 +36,4 @@ class SimplePointnet2Autoencoder(nn.Module):
         x = self.drop1(F.relu(self.bn1(self.conv1(l0_points))))
         x = self.conv2(x)
 
-        return x
+        return l0_xyz + x

@@ -3,5 +3,3 @@ torch
 tqdm
 scikit-learn
 open3d
-torch_geometric
-pytorch-cluster

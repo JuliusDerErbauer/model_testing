@@ -11,11 +11,11 @@ from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
-MODEL_PATH = "wheights/best_model_v3.pth"
+MODEL_PATH = "wheights/full_model_v0.pth"
 
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
-# best_model_v2 ->
+# full_model_v0 ->
 
 def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=10):
     best_val_loss = float('inf')  # To store the best validation loss
