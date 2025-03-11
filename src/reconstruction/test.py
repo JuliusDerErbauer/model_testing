@@ -9,7 +9,7 @@ from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 
-MODEL_PATH = "best_model_v1.pth"
+MODEL_PATH = "best_full_model.pth"
 OUTPUT_PATH = "model_outputs/model_output_v01.npy"
 
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     dataset = GripperSingleFrameDataset(
         "data/random_data_0.npy"
     )
-    dataset = Subset(dataset, [21])
+    dataset = Subset(dataset, [50])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
     model = SimplePointnet2Autoencoder()
     if os.path.exists(MODEL_PATH):

@@ -1,50 +1,51 @@
 import torch
-import os
-import numpy as np
 from torch.utils.data import Dataset
+import numpy as np
+import os
+import random
 
 
 class GripperTimeSeriesDataset(Dataset):
-    def __init__(self, root_dir, sequence_length=10, transform=None):
-        self.root_dir = root_dir
-        self.sequence_length = sequence_length
+    def __init__(self, directory, transform=None):
+        """
+        Args:
+            directory (str): Path to the directory containing .npy files.
+            transform (callable, optional): Optional transform to be applied on a sample.
+        """
+        self.directory = directory
         self.transform = transform
+        self.files = sorted([os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.npy')])
+        self.file_frame_counts = {f: self._num_frames(f) for f in self.files}
 
-        # List all .npy files (each representing a time series)
-        self.files = [os.path.join(root_dir, f) for f in sorted(os.listdir(root_dir)) if f.endswith('.npy')]
-
-    def load_point_clouds(self, file_path):
-        # Load the .npy file as a numpy array
-        return np.load(file_path, allow_pickle=True)
+    def _num_frames(self, file_path):
+        """Loads only the shape of the file to count frames without loading full data."""
+        return np.load(file_path, mmap_mode='r').shape[0]
 
     def __len__(self):
-        return len(self.files)
+        """Estimated total number of (frame, next_frame) pairs across all files."""
+        return sum(v - 1 for v in self.file_frame_counts.values())
 
     def __getitem__(self, idx):
-        file_path = self.files[idx]
-        point_clouds = self.load_point_clouds(file_path)
+        """Randomly selects a file and a frame from that file."""
+        file_path = random.choice(self.files)
+        num_frames = self.file_frame_counts[file_path]
 
-        # Select a sequence of frames (sequence_length)
-        # Make sure there's enough data to select the sequence
-        if len(point_clouds) < self.sequence_length:
-            raise IndexError("Not enough frames in this time series.")
+        if num_frames < 2:
+            return self.__getitem__(idx)  # Skip files with <2 frames
 
-        # Create time sequence slices (T, N, 3)
-        start_idx = np.random.randint(0, len(point_clouds) - self.sequence_length)
-        end_idx = start_idx + self.sequence_length
-        sequence = point_clouds[start_idx:end_idx]
+        frame_idx = random.randint(0, num_frames - 2)  # Select a frame except the last one
 
-        # Convert to tensor
-        sequence = torch.tensor(sequence)  # Shape (T, N, 3)
+        # Load only the required file and extract the needed frames
+        data = np.load(file_path, allow_pickle=True)
+        current_frame = data[frame_idx]  # Shape: (num_points, 3)
+        next_frame = data[frame_idx + 1]  # Shape: (num_points, 3)
+
+        # Convert to PyTorch tensors and reshape if necessary
+        current_frame = torch.tensor(current_frame, dtype=torch.float32).permute(1, 0)  # Shape: (3, num_points)
+        next_frame = torch.tensor(next_frame, dtype=torch.float32).permute(1, 0)  # Shape: (3, num_points)
 
         if self.transform:
-            sequence = self.transform(sequence)
+            current_frame = self.transform(current_frame)
+            next_frame = self.transform(next_frame)
 
-        return sequence
-
-
-if __name__ == "__main__":
-    dataset = GripperTimeSeriesDataset(
-        "/Users/julianheines/PycharmProjects/object_deformation/src/data/generated/training_data_linear_random"
-    )
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, shuffle=True)
+        return current_frame, next_frame

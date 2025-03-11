@@ -1,18 +1,17 @@
 import os.path
 
 from torch.utils.data.dataloader import DataLoader
-from torch.utils.data.dataset import Subset
 from sklearn.model_selection import train_test_split
 from torch import nn
 import torch.optim as optim
 import torch
 from tqdm import tqdm
 
-from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
+from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
-MODEL_PATH = "/Users/julianheines/PycharmProjects/model_testing/wheights/next_step_model_v0.pth"
+MODEL_PATH = "wheights/full_model_v0.pth"
 
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
@@ -27,8 +26,8 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
         # Training Loop
         for data in tqdm(train_dataloader, desc=f"Epoch {epoch + 1}/{epochs}"):
             optimizer.zero_grad()  # Zero gradients from previous step
-            inputs = data[0]  # assuming the data contains the point cloud or inputs
-            targets = data[1]  # your target data, or could be labels
+            inputs = data  # assuming the data contains the point cloud or inputs
+            targets = data  # your target data, or could be labels
 
             inputs = inputs.to(device)
             targets = targets.to(device)
@@ -43,6 +42,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             scheduler.step()
 
             running_loss += loss.item()
+            print(f"Loss: {loss}")
 
         avg_train_loss = running_loss / len(train_dataloader)  # Average training loss
         print(f"Train Loss: {avg_train_loss:.4f}")
@@ -54,7 +54,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
         # Save the best model based on validation loss
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(model.state_dict(), MODEL_PATH)  # Save model weights
+            torch.save(model.state_dict(), "best_model.pth")  # Save model weights
 
 
 def evaluate_model(model, val_dataloader, criterion, device):
@@ -62,8 +62,8 @@ def evaluate_model(model, val_dataloader, criterion, device):
     running_loss = 0.0
     with torch.no_grad():  # No gradient calculation during evaluation
         for data in val_dataloader:
-            inputs = data[0]
-            targets = data[1]
+            inputs = data
+            targets = data
             inputs = inputs.to(device)
             targets = targets.to(device)
 
@@ -87,25 +87,17 @@ if __name__ == "__main__":
 
     data_augmentation_pipeline = NoiseAugmentation()
 
-    dataset = GripperTimeSeriesDataset(
-        "/Users/julianheines/PycharmProjects/object_deformation/src/data/generated/training_data_linear_random",
+    dataset = GripperSingleFrameDataset(
+        "data/random_data_0.npy",
         transform=data_augmentation_pipeline
     )
 
-    indices = list(range(len(dataset)))
+    train_dataset, eval_dataset = train_test_split(dataset, test_size=0.2, random_state=17)
+    train_dataset, val_dataset = train_test_split(train_dataset, test_size=0.25, random_state=17)
 
-    train_indices, val_indices = train_test_split(indices, test_size=0.2, random_state=17)
-
-    train_subset = Subset(dataset, train_indices)
-    subset_indices = torch.randperm(len(train_subset))[:1000]
-    train_subset = Subset(train_subset, subset_indices)
-
-    val_subset = Subset(dataset, val_indices)
-    subset_indices = torch.randperm(len(train_subset))[:60]
-    val_subset = Subset(val_subset, subset_indices)
-
-    train_dataloader = DataLoader(train_subset, batch_size=100, shuffle=True)
-    val_dataloader = DataLoader(val_subset, batch_size=20, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, batch_size=20, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=20, shuffle=False)
+    eval_dataloader = DataLoader(eval_dataset, batch_size=20, shuffle=False)
 
     model = SimplePointnet2Autoencoder()
     if os.path.exists(MODEL_PATH):
@@ -114,4 +106,4 @@ if __name__ == "__main__":
     criterion = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
-    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=2)
+    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=10)
