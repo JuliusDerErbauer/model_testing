@@ -43,6 +43,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             scheduler.step()
 
             running_loss += loss.item()
+            print(f"Running loss: {running_loss}")
 
         avg_train_loss = running_loss / len(train_dataloader)  # Average training loss
         print(f"Train Loss: {avg_train_loss:.4f}")
