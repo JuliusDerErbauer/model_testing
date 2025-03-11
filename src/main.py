@@ -11,12 +11,13 @@ from tqdm import tqdm
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
+from model.pointnet_autoencoder import PCAutoEncoder
 
-MODEL_PATH = "wheights/next_step_model_v2.pth"
+MODEL_PATH = "wheights/next_step_model_pointnet_v0.pth"
 DATA_PATH = "data/training_data_linear_random"
-EPOCHS = 10
+EPOCHS = 50
 BATCH_SIZE = 20
-NUM_POINTS_TRAIN = 300
+NUM_POINTS_TRAIN = 1000
 SPLIT = 0.25
 NUM_POINTS_VAL = int(NUM_POINTS_TRAIN * SPLIT)
 
@@ -28,6 +29,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
     for epoch in range(epochs):
         model.train()  # Set model to training mode
         running_loss = 0.0
+        running_naive_loss = 0.0
 
         # Training Loop
         for data in tqdm(train_dataloader, desc=f"Epoch {epoch + 1}/{epochs}"):
@@ -39,8 +41,11 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             targets = targets.to(device)
 
             # Forward pass
-            outputs = model(inputs)  # Forward pass through the model
+            outputs, feature = model(inputs)  # Forward pass through the model
+            outputs = outputs + inputs
+
             loss = criterion(outputs, targets)  # Compute the loss
+            naive_loss = criterion(inputs, targets)
 
             # Backpropagation
             loss.backward()
@@ -48,10 +53,13 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             scheduler.step()
 
             running_loss += loss.item()
-            print(loss.item())
+            running_naive_loss += naive_loss.item()
 
         avg_train_loss = running_loss / len(train_dataloader)  # Average training loss
         print(f"Train Loss: {avg_train_loss:.4f}")
+
+        avg_naive_loss = running_naive_loss / len(train_dataloader)
+        print(f"Naive Loss {avg_naive_loss:.4f}")
 
         # Evaluate after each epoch
         val_loss = evaluate_model(model, val_dataloader, criterion, device)
@@ -73,7 +81,8 @@ def evaluate_model(model, val_dataloader, criterion, device):
             inputs = inputs.to(device)
             targets = targets.to(device)
 
-            outputs = model(inputs)
+            outputs, feat = model(inputs)
+            outputs = outputs + inputs
             loss = criterion(outputs, targets)
             running_loss += loss.item()
 
@@ -113,7 +122,7 @@ if __name__ == "__main__":
     train_dataloader = DataLoader(train_subset, batch_size=BATCH_SIZE, shuffle=True)
     val_dataloader = DataLoader(val_subset, batch_size=BATCH_SIZE, shuffle=False)
 
-    model = SimplePointnet2Autoencoder()
+    model = PCAutoEncoder()
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
