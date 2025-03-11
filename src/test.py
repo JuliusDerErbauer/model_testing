@@ -35,7 +35,7 @@ if __name__ == "__main__":
     print(device)
 
     dataset = GripperSingleFrameDataset(
-        "/Users/julianheines/PycharmProjects/object_deformation/src/data/generated/random_data_0.npy"
+        "data/random_data_0.npy"
     )
     dataset = Subset(dataset, [21])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)

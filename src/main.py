@@ -90,7 +90,7 @@ if __name__ == "__main__":
     )
 
     dataset = GripperSingleFrameDataset(
-        "/Users/julianheines/PycharmProjects/object_deformation/src/data/generated/random_data_0.npy",
+        "data/random_data_0.npy",
         transform=data_augmentation_pipeline
     )
 
