@@ -80,7 +80,7 @@ if __name__ == "__main__":
     if torch.backends.mps.is_available():
         device = "mps"
     elif torch.cuda.is_available():
-        "cuda"
+        device = "cuda"
     else:
         device = "cpu"
     device = torch.device(device)
