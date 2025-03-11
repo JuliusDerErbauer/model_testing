@@ -12,8 +12,13 @@ from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 
-MODEL_PATH = "/Users/julianheines/PycharmProjects/model_testing/wheights/next_step_model_v2.pth"
-
+MODEL_PATH = "wheights/next_step_model_v2.pth"
+DATA_PATH = "data/training_data_linear_random"
+EPOCHS = 10
+BATCH_SIZE = 20
+NUM_POINTS_TRAIN = 300
+SPLIT = 0.25
+NUM_POINTS_VAL = int(NUM_POINTS_TRAIN * SPLIT)
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
 # full_model_v0 ->
@@ -43,6 +48,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             scheduler.step()
 
             running_loss += loss.item()
+            print(loss.item())
 
         avg_train_loss = running_loss / len(train_dataloader)  # Average training loss
         print(f"Train Loss: {avg_train_loss:.4f}")
@@ -88,7 +94,7 @@ if __name__ == "__main__":
     data_augmentation_pipeline = NoiseAugmentation()
 
     dataset = GripperTimeSeriesDataset(
-        "data/training_data_linear_random",
+        DATA_PATH,
         transform=data_augmentation_pipeline
     )
 
@@ -97,15 +103,15 @@ if __name__ == "__main__":
     train_indices, val_indices = train_test_split(indices, test_size=0.2, random_state=17)
 
     train_subset = Subset(dataset, train_indices)
-    subset_indices = torch.randperm(len(train_subset))[:1000]
+    subset_indices = torch.randperm(len(train_subset))[:NUM_POINTS_TRAIN]
     train_subset = Subset(train_subset, subset_indices)
 
     val_subset = Subset(dataset, val_indices)
-    subset_indices = torch.randperm(len(train_subset))[:100]
+    subset_indices = torch.randperm(len(train_subset))[:NUM_POINTS_VAL]
     val_subset = Subset(val_subset, subset_indices)
 
-    train_dataloader = DataLoader(train_subset, batch_size=20, shuffle=True)
-    val_dataloader = DataLoader(val_subset, batch_size=20, shuffle=False)
+    train_dataloader = DataLoader(train_subset, batch_size=BATCH_SIZE, shuffle=True)
+    val_dataloader = DataLoader(val_subset, batch_size=BATCH_SIZE, shuffle=False)
 
     model = SimplePointnet2Autoencoder()
     if os.path.exists(MODEL_PATH):
@@ -114,4 +120,4 @@ if __name__ == "__main__":
     criterion = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
-    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=10)
+    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=EPOCHS)

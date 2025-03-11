@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch_cluster import fps
 from time import time
 import numpy as np
 
@@ -123,7 +124,23 @@ def sample_and_group(npoint, radius, nsample, xyz, points, returnfps=False):
     """
     B, N, C = xyz.shape
     S = npoint
-    fps_idx = farthest_point_sample(xyz, npoint)  # [B, npoint, C]
+
+    #fps_idx = farthest_point_sample(xyz, npoint)  # [B, npoint, C]
+
+    device = xyz.device  # Get current device
+
+    xyz_flat = xyz.reshape(B * N, C)  # [B*N, C]
+    batch = torch.arange(B, device=device).repeat_interleave(N)  # [B*N]
+
+    if device.type == "mps":
+        fps_idx = fps(xyz_flat.contiguous().cpu(), batch=batch.cpu(), ratio=npoint / N)
+        fps_idx = fps_idx.to(device)
+        xyz = xyz.to(device)  # Ensure xyz is back on MPS
+    else:
+        fps_idx = fps(xyz_flat, batch=batch, ratio=npoint / N)  # Normal GPU/CPU execution
+
+    fps_idx = fps_idx.view(B, -1)  # [B, S]
+
     new_xyz = index_points(xyz, fps_idx)
     idx = query_ball_point(radius, nsample, xyz, new_xyz)
     grouped_xyz = index_points(xyz, idx)  # [B, npoint, nsample, C]
