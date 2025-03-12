@@ -9,22 +9,54 @@ import torch
 from tqdm import tqdm
 
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
+from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
 
-MODEL_PATH = "wheights/next_step_model_pointnet_v0.pth"
-DATA_PATH = "data/training_data_linear_random"
+
+def next_step_prediction_task(data, model, device):
+    inputs = data[0]
+    targets = data[1]
+
+    inputs = inputs.to(device)
+    targets = targets.to(device)
+
+    # Forward pass
+    outputs, feature = model(inputs)  # Forward pass through the model
+    outputs = outputs + inputs
+    return (inputs, outputs, targets)
+
+
+def reconstruction_task(data, model, device):
+    inputs = data
+
+    inputs = inputs.to(device)
+    targets = inputs
+    outputs, feature = model(inputs)
+
+    return (inputs, outputs, targets)
+
+
+
+
+MODEL_PATH = "wheights/reconstruction_full_model_v1.pth"
+DATA_PATH = "data/random_data_0.npy"
 EPOCHS = 50
 BATCH_SIZE = 20
-NUM_POINTS_TRAIN = 1000
-SPLIT = 0.25
-NUM_POINTS_VAL = int(NUM_POINTS_TRAIN * SPLIT)
+NUM_POINT_CLOUDS = 300
+SPLIT = 0.2
+NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
+
+NUM_POINTS_VAL = int(NUM_POINT_CLOUDS * SPLIT)
+TASK = reconstruction_task
+
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
-# full_model_v0 ->
+# next_stept_model_pointnetv2 ->
 
-def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=10):
+
+def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, task, device, epochs=10):
     best_val_loss = float('inf')  # To store the best validation loss
     for epoch in range(epochs):
         model.train()  # Set model to training mode
@@ -34,26 +66,19 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
         # Training Loop
         for data in tqdm(train_dataloader, desc=f"Epoch {epoch + 1}/{epochs}"):
             optimizer.zero_grad()  # Zero gradients from previous step
-            inputs = data[0]  # assuming the data contains the point cloud or inputs
-            targets = data[1]  # your target data, or could be labels
 
-            inputs = inputs.to(device)
-            targets = targets.to(device)
-
-            # Forward pass
-            outputs, feature = model(inputs)  # Forward pass through the model
-            outputs = outputs + inputs
+            (inputs, outputs, targets) = task(data, model, device)
 
             loss = criterion(outputs, targets)  # Compute the loss
             naive_loss = criterion(inputs, targets)
+
+            running_loss += loss.item()
+            running_naive_loss += naive_loss.item()
 
             # Backpropagation
             loss.backward()
             optimizer.step()
             scheduler.step()
-
-            running_loss += loss.item()
-            running_naive_loss += naive_loss.item()
 
         avg_train_loss = running_loss / len(train_dataloader)  # Average training loss
         print(f"Train Loss: {avg_train_loss:.4f}")
@@ -62,7 +87,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
         print(f"Naive Loss {avg_naive_loss:.4f}")
 
         # Evaluate after each epoch
-        val_loss = evaluate_model(model, val_dataloader, criterion, device)
+        val_loss = evaluate_model(model, val_dataloader, criterion, task, device)
         print(f"Validation Loss: {val_loss:.4f}")
 
         # Save the best model based on validation loss
@@ -71,22 +96,21 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
             torch.save(model.state_dict(), MODEL_PATH)  # Save model weights
 
 
-def evaluate_model(model, val_dataloader, criterion, device):
+def evaluate_model(model, val_dataloader, criterion, task, device):
     model.eval()  # Set model to evaluation mode
     running_loss = 0.0
+    running_naive_loss = 0.0
     with torch.no_grad():  # No gradient calculation during evaluation
         for data in val_dataloader:
-            inputs = data[0]
-            targets = data[1]
-            inputs = inputs.to(device)
-            targets = targets.to(device)
-
-            outputs, feat = model(inputs)
-            outputs = outputs + inputs
+            (inputs, outputs, targets) = task(data, model, device)
             loss = criterion(outputs, targets)
+            naive_loss = criterion(inputs, targets)
+
             running_loss += loss.item()
+            running_naive_loss += naive_loss.item()
 
     avg_val_loss = running_loss / len(val_dataloader)
+    print(f"Naive Loss eval: {running_naive_loss / len(val_dataloader):.4f}")
     return avg_val_loss
 
 
@@ -102,7 +126,7 @@ if __name__ == "__main__":
 
     data_augmentation_pipeline = NoiseAugmentation()
 
-    dataset = GripperTimeSeriesDataset(
+    dataset = GripperSingleFrameDataset(
         DATA_PATH,
         transform=data_augmentation_pipeline
     )
@@ -116,17 +140,18 @@ if __name__ == "__main__":
     train_subset = Subset(train_subset, subset_indices)
 
     val_subset = Subset(dataset, val_indices)
-    subset_indices = torch.randperm(len(train_subset))[:NUM_POINTS_VAL]
+    subset_indices = torch.randperm(len(val_subset))[:NUM_POINTS_VAL]
     val_subset = Subset(val_subset, subset_indices)
 
     train_dataloader = DataLoader(train_subset, batch_size=BATCH_SIZE, shuffle=True)
     val_dataloader = DataLoader(val_subset, batch_size=BATCH_SIZE, shuffle=False)
 
-    model = PCAutoEncoder()
+    model = SimplePointnet2Autoencoder()
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
     criterion = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
-    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, device, epochs=EPOCHS)
+    train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
+                device, epochs=EPOCHS)

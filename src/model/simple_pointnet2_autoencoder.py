@@ -16,7 +16,7 @@ class SimplePointnet2Autoencoder(nn.Module):
         self.fp1 = PointNetFeaturePropagation(128, [128, 128, 128])
         self.conv1 = nn.Conv1d(128, 128, 1)
         self.bn1 = nn.BatchNorm1d(128)
-        self.drop1 = nn.Dropout(0.5)
+        self.drop1 = nn.Dropout(0.8)
         self.conv2 = nn.Conv1d(128, 3, 1)
 
     def forward(self, xyz):

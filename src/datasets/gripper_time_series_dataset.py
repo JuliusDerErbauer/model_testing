@@ -21,6 +21,9 @@ class GripperTimeSeriesDataset(Dataset):
         """Loads only the shape of the file to count frames without loading full data."""
         return np.load(file_path, mmap_mode='r').shape[0]
 
+    def set_frame_idx(self, idx):
+        self.frame_idx = idx
+
     def __len__(self):
         """Estimated total number of (frame, next_frame) pairs across all files."""
         return sum(v - 1 for v in self.file_frame_counts.values())
@@ -34,6 +37,9 @@ class GripperTimeSeriesDataset(Dataset):
             return self.__getitem__(idx)  # Skip files with <2 frames
 
         frame_idx = random.randint(0, num_frames - 2)  # Select a frame except the last one
+
+        if self.frame_idx:
+            frame_idx = self.frame_idx
 
         # Load only the required file and extract the needed frames
         data = np.load(file_path, allow_pickle=True)
