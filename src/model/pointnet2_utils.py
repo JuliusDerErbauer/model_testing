@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_cluster import fps
 from time import time
 import numpy as np
 
