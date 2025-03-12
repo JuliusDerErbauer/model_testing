@@ -16,6 +16,14 @@ from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
 
 
+class ChamferLoss:
+    def __init__(self):
+        self.loss = ChamferDistance()
+
+    def forward(self, x):
+        return self.loss(x)[0]
+
+
 def next_step_prediction_task(data, model, device):
     inputs = data[0]
     targets = data[1]
@@ -149,7 +157,7 @@ def main():
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
-    criterion = ChamferDistance()
+    criterion = ChamferLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
