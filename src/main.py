@@ -16,8 +16,9 @@ from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
 
 
-class ChamferLoss:
+class ChamferLoss(nn.Module):
     def __init__(self):
+        super(ChamferLoss, self).__init__()
         self.loss = ChamferDistance()
 
     def forward(self, x):
