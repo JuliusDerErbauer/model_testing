@@ -33,7 +33,7 @@ class GripperSingleFrameDataset(Dataset):
 
     def __getitem__(self, idx):
         point_cloud = self.point_clouds[idx]
-        standardize_bbox(point_cloud)
+        point_cloud = standardize_bbox(point_cloud)
         point_cloud = torch.tensor(point_cloud, dtype=torch.float32)
         point_cloud = point_cloud.permute(1, 0)
 
