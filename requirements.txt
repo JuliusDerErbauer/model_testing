@@ -3,6 +3,8 @@ torch
 tqdm
 scikit-learn
 open3d
-torch_cluster
+torch-scatter
+torch-sparse
+torch-cluster
+torch-spline-conv
 git+https://github.com/otaheri/chamfer_distance.git
-pytorch3d
