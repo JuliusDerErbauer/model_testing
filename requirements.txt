@@ -2,5 +2,4 @@ numpy==1.26.4
 torch
 tqdm
 scikit-learn
-open3d
 git+https://github.com/otaheri/chamfer_distance.git
