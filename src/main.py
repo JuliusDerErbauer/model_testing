@@ -9,11 +9,11 @@ import torch
 from tqdm import tqdm
 from chamfer_distance import ChamferDistance
 
-from src.datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
-from src.datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
-from src.data_prerepration.noise_augmentation import NoiseAugmentation
-from src.model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
-from src.model.pointnet_autoencoder import PCAutoEncoder
+from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
+from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
+from data_prerepration.noise_augmentation import NoiseAugmentation
+from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
+from model.pointnet_autoencoder import PCAutoEncoder
 
 
 def next_step_prediction_task(data, model, device):
