@@ -7,6 +7,7 @@ from torch import nn
 import torch.optim as optim
 import torch
 from tqdm import tqdm
+from chamfer_distance import ChamferDistance
 
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
@@ -36,8 +37,6 @@ def reconstruction_task(data, model, device):
     outputs, feature = model(inputs)
 
     return (inputs, outputs, targets)
-
-
 
 
 MODEL_PATH = "wheights/reconstruction_full_model_v1.pth"
@@ -114,7 +113,7 @@ def evaluate_model(model, val_dataloader, criterion, task, device):
     return avg_val_loss
 
 
-if __name__ == "__main__":
+def main():
     device = None
     if torch.backends.mps.is_available():
         device = "mps"
@@ -150,8 +149,12 @@ if __name__ == "__main__":
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
-    criterion = nn.L1Loss()
+    criterion = ChamferDistance()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
                 device, epochs=EPOCHS)
+
+
+if __name__ == "__main__":
+    main()

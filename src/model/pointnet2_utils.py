@@ -137,7 +137,7 @@ def sample_and_group(npoint, radius, nsample, xyz, points, returnfps=False):
         fps_idx = fps_idx.to(device)
         xyz = xyz.to(device)  # Ensure xyz is back on MPS
     else:
-        fps_idx = fps(xyz_flat, batch=batch, ratio=npoint / N)  # Normal GPU/CPU execution
+        fps_idx = fps(xyz_flat, batch=batch, ratio=npoint / N)  # Normal GPU execution
 
     fps_idx = fps_idx.view(B, -1)  # [B, S]
 
