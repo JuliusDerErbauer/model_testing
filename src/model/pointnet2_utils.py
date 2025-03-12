@@ -132,7 +132,7 @@ def sample_and_group(npoint, radius, nsample, xyz, points, returnfps=False):
     xyz_flat = xyz.reshape(B * N, C)  # [B*N, C]
     batch = torch.arange(B, device=device).repeat_interleave(N)  # [B*N]
 
-    if device.type == "mps":
+    if device.type == "mps" or device.type == "cuda":
         fps_idx = fps(xyz_flat.contiguous().cpu(), batch=batch.cpu(), ratio=npoint / N)
         fps_idx = fps_idx.to(device)
         xyz = xyz.to(device)  # Ensure xyz is back on MPS
