@@ -3,5 +3,4 @@ torch
 tqdm
 scikit-learn
 open3d
-pytorch3d
 git+https://github.com/otaheri/chamfer_distance.git
