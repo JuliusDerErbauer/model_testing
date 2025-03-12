@@ -1,6 +1,7 @@
 import torch.nn as nn
-from model.pointnet2_utils import PointNetSetAbstraction, PointNetFeaturePropagation
 import torch.nn.functional as F
+
+from src.model.pointnet2_utils import PointNetSetAbstraction, PointNetFeaturePropagation
 
 
 class SimplePointnet2Autoencoder(nn.Module):
