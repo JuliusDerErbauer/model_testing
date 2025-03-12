@@ -8,6 +8,7 @@ import torch.optim as optim
 import torch
 from tqdm import tqdm
 from chamfer_distance import ChamferDistance
+from task import reconstruction_task, next_step_prediction_task
 
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
@@ -28,27 +29,6 @@ class ChamferLoss(nn.Module):
         return loss.mean()
 
 
-def next_step_prediction_task(data, model, device):
-    inputs = data[0]
-    targets = data[1]
-
-    inputs = inputs.to(device)
-    targets = targets.to(device)
-
-    # Forward pass
-    outputs, feature = model(inputs)  # Forward pass through the model
-    outputs = outputs + inputs
-    return (inputs, outputs, targets)
-
-
-def reconstruction_task(data, model, device):
-    inputs = data
-
-    inputs = inputs.to(device)
-    targets = inputs
-    outputs, feature = model(inputs)
-
-    return (inputs, outputs, targets)
 
 
 MODEL_PATH = "wheights/reconstruction_full_model_v1.pth"

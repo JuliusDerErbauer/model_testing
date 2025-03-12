@@ -2,7 +2,7 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Subset
 import numpy as np
-from main import reconstruction_task, next_step_prediction_task
+from task import next_step_prediction_task, reconstruction_task
 
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
@@ -10,9 +10,9 @@ from model.pointnet_autoencoder import PCAutoEncoder
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 
-MODEL_PATH = "wheights/next_step_model_pointnet_v0.pth"
+MODEL_PATH = "wheights/reconstruction_full_model_chamfer_v2.pth"
 DATA_PATH = "data/random_data_0.npy"
-OUTPUT_PATH = "model_outputs/pointnet_output_v00.npy"
+OUTPUT_PATH = "model_outputs/chamfer_output_v00.npy"
 TASK = reconstruction_task
 
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     )
     dataset = Subset(dataset, [18])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
-    model = PCAutoEncoder()
+    model = SimplePointnet2Autoencoder()
     model.load_state_dict(torch.load(MODEL_PATH))
 
     model.to(device)
