@@ -21,8 +21,8 @@ class ChamferLoss(nn.Module):
         super(ChamferLoss, self).__init__()
         self.loss = ChamferDistance()
 
-    def forward(self, x):
-        return self.loss(x)[0]
+    def forward(self, *args):
+        return self.loss(*args)[0]
 
 
 def next_step_prediction_task(data, model, device):
