@@ -125,8 +125,8 @@ def sample_and_group(npoint, radius, nsample, xyz, points, returnfps=False):
     B, N, C = xyz.shape
     S = npoint
 
-    #fps_idx = farthest_point_sample(xyz, npoint)  # [B, npoint, C]
-
+    fps_idx = farthest_point_sample(xyz, npoint)  # [B, npoint, C]
+    """
     device = xyz.device  # Get current device
 
     xyz_flat = xyz.reshape(B * N, C)  # [B*N, C]
@@ -138,7 +138,7 @@ def sample_and_group(npoint, radius, nsample, xyz, points, returnfps=False):
         xyz = xyz.to(device)  # Ensure xyz is back on MPS
     else:
         fps_idx = fps(xyz_flat, batch=batch, ratio=npoint / N)  # Normal GPU execution
-
+    """
     fps_idx = fps_idx.view(B, -1)  # [B, S]
 
     new_xyz = index_points(xyz, fps_idx)
