@@ -11,7 +11,6 @@ def standardize_bbox(pcl):
     maxs = np.amax(pcl_flat, axis=0)  # Global max for each coordinate, shape: (3,)
     center = (mins + maxs) / 2.  # Global center, shape: (3,)
     scale = np.amax(maxs - mins)  # Scalar scale factor
-    print("Center: {}, Scale: {}".format(center, scale))
 
     result = ((pcl - center) / scale).astype(np.float32)
     return result

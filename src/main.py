@@ -31,11 +31,11 @@ class ChamferLoss(nn.Module):
 
 
 
-MODEL_PATH = "wheights/reconstruction_full_model_v1.pth"
+MODEL_PATH = "wheights/reconstruction_full_model_v2.pth"
 DATA_PATH = "data/random_data_0.npy"
 EPOCHS = 50
 BATCH_SIZE = 20
-NUM_POINT_CLOUDS = 300
+NUM_POINT_CLOUDS = 1000
 SPLIT = 0.2
 NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
 
@@ -137,11 +137,11 @@ def main():
     train_dataloader = DataLoader(train_subset, batch_size=BATCH_SIZE, shuffle=True)
     val_dataloader = DataLoader(val_subset, batch_size=BATCH_SIZE, shuffle=False)
 
-    model = SimplePointnet2Autoencoder()
+    model = PCAutoEncoder()
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
-    criterion = ChamferLoss()
+    criterion = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
