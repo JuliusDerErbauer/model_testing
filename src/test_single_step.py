@@ -12,7 +12,7 @@ from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 
 MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
-OUTPUT_PATH = "model_outputs/reconstruction_output_chamfer_v00.npy"
+OUTPUT_PATH = "model_outputs/reconstruction_output_chamfer_v01.npy"
 TASK = reconstruction_task
 
 

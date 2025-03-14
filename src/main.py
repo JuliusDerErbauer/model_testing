@@ -143,7 +143,7 @@ def main():
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
     criterion = LOSS()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
                 device, epochs=EPOCHS)
