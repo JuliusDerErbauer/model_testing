@@ -10,9 +10,9 @@ from model.pointnet_autoencoder import PCAutoEncoder
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 
-MODEL_PATH = "wheights/reconstruction_full_model_v2.pth"
+MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
-OUTPUT_PATH = "model_outputs/reconstruction_output_v01.npy"
+OUTPUT_PATH = "model_outputs/reconstruction_output_chamfer_v00.npy"
 TASK = reconstruction_task
 
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     )
     dataset = Subset(dataset, [18])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
-    model = SimplePointnet2Autoencoder()
+    model = PCAutoEncoder()
     model.load_state_dict(torch.load(MODEL_PATH))
 
     model.to(device)
