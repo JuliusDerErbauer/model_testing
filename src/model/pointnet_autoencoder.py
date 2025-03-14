@@ -35,6 +35,8 @@ class PCAutoEncoder(nn.Module):
         point_dim = x.shape[1]
         num_points = x.shape[2]
 
+        x = x.view(batch_size, 1, num_points, point_dim)
+
         # encoder
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn1(self.conv2(x)))
