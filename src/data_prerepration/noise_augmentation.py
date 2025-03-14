@@ -2,7 +2,7 @@ import torch
 
 
 class NoiseAugmentation:
-    def __init__(self, mean=0.0, std=0.001):
+    def __init__(self, mean=0.0, std=0.01):
         """
         Args:
             mean (float): Mean of the Gaussian noise.

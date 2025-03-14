@@ -13,20 +13,21 @@ class PCAutoEncoder(nn.Module):
     def __init__(self, point_dim=3, num_points=1024):
         super(PCAutoEncoder, self).__init__()
 
-        self.conv1 = nn.Conv1d(in_channels=point_dim, out_channels=64, kernel_size=1)
-        self.conv2 = nn.Conv1d(in_channels=64, out_channels=64, kernel_size=1)
-        self.conv3 = nn.Conv1d(in_channels=64, out_channels=64, kernel_size=1)
-        self.conv4 = nn.Conv1d(in_channels=64, out_channels=128, kernel_size=1)
-        self.conv5 = nn.Conv1d(in_channels=128, out_channels=1024, kernel_size=1)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=64, kernel_size=(1, point_dim))
+        self.conv2 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(1, 1))
+        self.conv3 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(1, 1))
+        self.conv4 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(1, 1))
+        self.conv5 = nn.Conv2d(in_channels=128, out_channels=1024, kernel_size=(1, 1))
 
         self.fc1 = nn.Linear(in_features=1024, out_features=1024)
         self.fc2 = nn.Linear(in_features=1024, out_features=1024)
         self.fc3 = nn.Linear(in_features=1024, out_features=num_points * 3)
 
         # batch norm
-        self.bn1 = nn.BatchNorm1d(64)
-        self.bn2 = nn.BatchNorm1d(128)
-        self.bn3 = nn.BatchNorm1d(1024)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.bn2 = nn.BatchNorm2d(128)
+        self.bn3 = nn.BatchNorm2d(1024)
+        self.bn4 = nn.BatchNorm1d(1024)
 
     def forward(self, x):
         xyz = x
@@ -48,8 +49,8 @@ class PCAutoEncoder(nn.Module):
         global_feat = x
 
         # decoder
-        x = F.relu(self.bn3(self.fc1(x)))
-        x = F.relu(self.bn3(self.fc2(x)))
+        x = F.relu(self.bn4(self.fc1(x)))
+        x = F.relu(self.bn4(self.fc2(x)))
         reconstructed_points = self.fc3(x)
 
         # do reshaping

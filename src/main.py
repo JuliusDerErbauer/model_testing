@@ -31,7 +31,7 @@ class ChamferLoss(nn.Module):
 
 
 
-MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v0.pth"
+MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v1.pth"
 DATA_PATH = "data/random_data_0.npy"
 EPOCHS = 50
 BATCH_SIZE = 20
@@ -116,7 +116,7 @@ def main():
         device = "cpu"
     device = torch.device(device)
 
-    data_augmentation_pipeline = NoiseAugmentation()
+    data_augmentation_pipeline = NoiseAugmentation(std=0.01)
 
     dataset = GripperSingleFrameDataset(
         DATA_PATH,
@@ -143,8 +143,8 @@ def main():
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
     criterion = LOSS()
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
-    scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
                 device, epochs=EPOCHS)
 
