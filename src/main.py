@@ -33,7 +33,7 @@ class ChamferLoss(nn.Module):
 
 MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
-EPOCHS = 5
+EPOCHS = 500
 BATCH_SIZE = 20
 NUM_POINT_CLOUDS = 10000
 SPLIT = 0.2
