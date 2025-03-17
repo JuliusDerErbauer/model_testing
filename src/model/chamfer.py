@@ -1,5 +1,6 @@
 from chamfer_distance import ChamferDistance
 from torch import nn
+import torch
 
 
 class ChamferLoss(nn.Module):
@@ -10,5 +11,8 @@ class ChamferLoss(nn.Module):
     def forward(self, x, y):
         x = x.permute(0, 2, 1)
         y = y.permute(0, 2, 1)
-        loss = self.loss(x, y)[0]
-        return loss.mean()
+        loss_x, _ = self.loss(x, y)
+        print(loss_x.size())
+        loss_y, _ = self.loss(x, y)
+
+        return torch.mean(loss_x) + torch.mean(loss_y)

@@ -28,9 +28,9 @@ def lr_lambda(epoch):
     return max(lr, 0.0005) / 0.05  # Normalize by initial LR
 
 
-MODEL_PATH = "weights/reconstruction_chamfer_pointnet_model_v1.pth"
+MODEL_PATH = "weights/reconstruction_pointnet_small_latent_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
-EPOCHS = 10000
+EPOCHS = 100
 BATCH_SIZE = 28
 NUM_POINT_CLOUDS = 10000
 SPLIT = 0.2
