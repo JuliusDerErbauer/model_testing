@@ -12,7 +12,7 @@ class ChamferLoss(nn.Module):
         x = x.permute(0, 2, 1)
         y = y.permute(0, 2, 1)
         loss_x = self.loss(x, y)
-        print(loss_x.detatch().cpu().numpy())
+        print(loss_x.cpu().numpy())
         print(loss_x.size())
         (loss_y, _) = self.loss(x, y)
 
