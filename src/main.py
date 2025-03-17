@@ -26,8 +26,8 @@ def lr_lambda(epoch):
 
 MODEL_PATH = "weights/reconstruction_chamfer_pointnet_model_v1.pth"
 DATA_PATH = "data/random_data_0.npy"
-EPOCHS = 1000
-BATCH_SIZE = 20
+EPOCHS = 10000
+BATCH_SIZE = 28
 NUM_POINT_CLOUDS = 10000
 SPLIT = 0.2
 NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
