@@ -15,6 +15,7 @@ from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
+from model.pointnet_simple import PointCloudAE
 
 
 class ChamferLoss(nn.Module):
@@ -29,11 +30,9 @@ class ChamferLoss(nn.Module):
         return loss.mean()
 
 
-
-
 MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v1.pth"
 DATA_PATH = "data/random_data_0.npy"
-EPOCHS = 50
+EPOCHS = 5
 BATCH_SIZE = 20
 NUM_POINT_CLOUDS = 10000
 SPLIT = 0.2
@@ -41,8 +40,11 @@ NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
 
 NUM_POINTS_VAL = int(NUM_POINT_CLOUDS * SPLIT)
 TASK = reconstruction_task
-MODEL = PCAutoEncoder
+MODEL = PointCloudAE
 LOSS = ChamferLoss
+LR = 0.001
+DECAY_PER_EPOCH = 0.99
+
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
 # next_stept_model_pointnetv2 ->
@@ -143,8 +145,8 @@ def main():
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
     criterion = LOSS()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
+    optimizer = optim.Adam(model.parameters(), lr=LR)
+    scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=DECAY_PER_EPOCH)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
                 device, epochs=EPOCHS)
 
