@@ -2,6 +2,8 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Subset
 import numpy as np
+
+from model.pointnet_simple import PointCloudAE
 from task import next_step_prediction_task, reconstruction_task
 
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
@@ -49,7 +51,7 @@ if __name__ == "__main__":
     )
     dataset = Subset(dataset, [18])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
-    model = PCAutoEncoder()
+    model = PointCloudAE(3, 128)
     model.load_state_dict(torch.load(MODEL_PATH))
 
     model.to(device)
