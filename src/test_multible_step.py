@@ -9,7 +9,7 @@ from model.pointnet_autoencoder import PCAutoEncoder
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 
-MODEL_PATH = "wheights/next_step_model_pointnet_v0.pth"
+MODEL_PATH = "weights/next_step_model_pointnet_v0.pth"
 DATA_PATH = "/Users/julianheines/PycharmProjects/object_deformation/src/data/generated/training_data_all_arms_same"
 OUTPUT_PATH = "model_outputs/pointnet_series_output_v00.npy"
 

@@ -35,7 +35,7 @@ def lr_lambda(epoch):
     return max(lr, 0.0005) / 0.05  # Normalize by initial LR
 
 
-MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v1.pth"
+MODEL_PATH = "weights/reconstruction_chamfer_pointnet_model_v1.pth"
 DATA_PATH = "data/random_data_0.npy"
 EPOCHS = 5
 BATCH_SIZE = 20
