@@ -10,7 +10,7 @@ from model.pointnet_autoencoder import PCAutoEncoder
 from datasets.gripper_single_frame_dataset import GripperSingleFrameDataset
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
 
-MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v0.pth"
+MODEL_PATH = "weights/reconstruction_chamfer_pointnet_model_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
 OUTPUT_PATH = "model_outputs/reconstruction_output_chamfer_v01.npy"
 TASK = reconstruction_task
