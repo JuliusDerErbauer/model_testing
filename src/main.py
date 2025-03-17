@@ -45,7 +45,7 @@ NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
 
 NUM_POINTS_VAL = int(NUM_POINT_CLOUDS * SPLIT)
 TASK = reconstruction_task
-MODEL = PointCloudAE
+MODEL = PointCloudAE(3, 128)
 LOSS = ChamferLoss
 LR = 0.0005
 LERNING_RATE = lr_lambda
@@ -145,7 +145,7 @@ def main():
     train_dataloader = DataLoader(train_subset, batch_size=BATCH_SIZE, shuffle=True)
     val_dataloader = DataLoader(val_subset, batch_size=BATCH_SIZE, shuffle=False)
 
-    model = MODEL()
+    model = MODEL
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
