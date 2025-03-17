@@ -51,7 +51,7 @@ if __name__ == "__main__":
     )
     dataset = Subset(dataset, [18])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
-    model = PointCloudAE(1024, 3)
+    model = PointCloudAE(1024, 128)
     model.load_state_dict(torch.load(MODEL_PATH))
 
     model.to(device)
