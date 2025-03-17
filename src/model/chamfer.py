@@ -11,10 +11,6 @@ class ChamferLoss(nn.Module):
     def forward(self, x, y):
         x = x.permute(0, 2, 1)
         y = y.permute(0, 2, 1)
-        dist_x = self.loss(x, y)
-        dist_y = self.loss(y, x)
-
-        print("dist_x:", dist_x)
-        print("dist_y:", dist_y)
+        dist_x, dist_y, indices_x, indices_y = self.loss(x, y)
 
         return torch.mean(dist_x) + torch.mean(dist_y)
