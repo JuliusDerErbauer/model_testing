@@ -30,6 +30,11 @@ class ChamferLoss(nn.Module):
         return loss.mean()
 
 
+def lr_lambda(epoch):
+    lr = 0.1 * (0.5 ** epoch)  # Halve LR each epoch
+    return max(lr, 0.0005) / 0.05  # Normalize by initial LR
+
+
 MODEL_PATH = "wheights/reconstruction_chamfer_pointnet_model_v1.pth"
 DATA_PATH = "data/random_data_0.npy"
 EPOCHS = 5
@@ -42,8 +47,8 @@ NUM_POINTS_VAL = int(NUM_POINT_CLOUDS * SPLIT)
 TASK = reconstruction_task
 MODEL = PointCloudAE
 LOSS = ChamferLoss
-LR = 0.001
-DECAY_PER_EPOCH = 0.99
+LR = 0.0005
+LERNING_RATE = lr_lambda
 
 
 # best_model_v1 -> 68.7471 training loss (arround 67 training loss)
@@ -146,7 +151,7 @@ def main():
     model.to(device)
     criterion = LOSS()
     optimizer = optim.Adam(model.parameters(), lr=LR)
-    scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=DECAY_PER_EPOCH)
+    scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
                 device, epochs=EPOCHS)
 
