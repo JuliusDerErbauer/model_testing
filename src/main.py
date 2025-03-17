@@ -21,6 +21,10 @@ from model.chamfer import ChamferLoss
 
 def lr_lambda(epoch):
     lr = 0.1 * (0.5 ** epoch)  # Halve LR each epoch
+    if (epoch > 1000):
+        return 0.0002
+    if (epoch > 5000):
+        return 0.0001
     return max(lr, 0.0005) / 0.05  # Normalize by initial LR
 
 
