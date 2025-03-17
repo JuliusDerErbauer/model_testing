@@ -30,7 +30,7 @@ def lr_lambda(epoch):
 
 MODEL_PATH = "weights/reconstruction_pointnet_small_latent_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
-EPOCHS = 10000
+EPOCHS = 1000
 BATCH_SIZE = 28
 NUM_POINT_CLOUDS = 10000
 SPLIT = 0.2
@@ -116,7 +116,7 @@ def main():
         device = "cpu"
     device = torch.device(device)
 
-    data_augmentation_pipeline = NoiseAugmentation(std=0.01)
+    data_augmentation_pipeline = NoiseAugmentation(std=0.001)
 
     dataset = GripperSingleFrameDataset(
         DATA_PATH,
