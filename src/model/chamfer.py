@@ -11,7 +11,8 @@ class ChamferLoss(nn.Module):
     def forward(self, x, y):
         x = x.permute(0, 2, 1)
         y = y.permute(0, 2, 1)
-        (loss_x, _) = self.loss(x, y)
+        loss_x = self.loss(x, y)
+        print(loss_x.detatch().cpu().numpy())
         print(loss_x.size())
         (loss_y, _) = self.loss(x, y)
 
