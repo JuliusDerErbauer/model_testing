@@ -45,7 +45,7 @@ NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
 
 NUM_POINTS_VAL = int(NUM_POINT_CLOUDS * SPLIT)
 TASK = reconstruction_task
-MODEL = PointCloudAE(3, 128)
+MODEL = PointCloudAE(1024, 128)
 LOSS = ChamferLoss
 LR = 0.0005
 LERNING_RATE = lr_lambda
