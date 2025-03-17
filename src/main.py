@@ -7,7 +7,6 @@ from torch import nn
 import torch.optim as optim
 import torch
 from tqdm import tqdm
-from chamfer_distance import ChamferDistance
 from task import reconstruction_task, next_step_prediction_task
 
 from datasets.gripper_time_series_dataset import GripperTimeSeriesDataset
@@ -17,17 +16,7 @@ from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
 from model.pointnet_simple import PointCloudAE
 
-
-class ChamferLoss(nn.Module):
-    def __init__(self):
-        super(ChamferLoss, self).__init__()
-        self.loss = ChamferDistance()
-
-    def forward(self, x, y):
-        x = x.permute(0, 2, 1)
-        y = y.permute(0, 2, 1)
-        loss = self.loss(x, y)[0]
-        return loss.mean()
+from model.chamfer import ChamferLoss
 
 
 def lr_lambda(epoch):

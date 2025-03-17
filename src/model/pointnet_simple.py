@@ -45,5 +45,5 @@ class PointCloudAE(nn.Module):
         x = self.encoder(x)
         feat = x
         x = self.decoder(x)
-        x.permute(0, 2, 1)
+        x = x.permute(1, 2)
         return x, feat
