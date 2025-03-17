@@ -30,7 +30,7 @@ def lr_lambda(epoch):
 
 MODEL_PATH = "weights/reconstruction_pointnet_small_latent_v0.pth"
 DATA_PATH = "data/random_data_0.npy"
-EPOCHS = 100
+EPOCHS = 10000
 BATCH_SIZE = 28
 NUM_POINT_CLOUDS = 10000
 SPLIT = 0.2
