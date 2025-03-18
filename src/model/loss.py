@@ -1,6 +1,6 @@
 from torch import nn
 from pytorch3d.loss import chamfer_distance
-from sinkhorn import SinkhornDistance
+from model.sinkhorn import SinkhornDistance
 
 
 class ChamferLoss(nn.Module):
