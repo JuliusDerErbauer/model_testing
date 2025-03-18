@@ -8,9 +8,9 @@ class ChamferLoss(nn.Module):
     def forward(self, x, y):
         x = x.permute(0, 2, 1)
         y = y.permute(0, 2, 1)
-        dist_x, dist_y, indices_x, indices_y = chamfer_distance(x, y, point_reduction='mean')
-        print(f"dist_x: {dist_x}, dist_y: {dist_y}")
-        return dist_x + dist_y
+        dist, normals = chamfer_distance(x, y, point_reduction='mean')
+        print(f"dist_x: {dist}")
+        return dist
 
 
 class EMDLoss(nn.Module):
