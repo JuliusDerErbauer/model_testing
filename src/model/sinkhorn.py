@@ -72,3 +72,14 @@ class SinkhornDistance(torch.nn.Module):
     def ave(u, u1, tau):
         "Barycenter subroutine, used by kinetic acceleration through extrapolation."
         return tau * u + (1 - tau) * u1
+
+
+def compute_cost_matrix(x, y):
+    # x: Tensor of shape (N, P_1, D)
+    # y: Tensor of shape (N, P_2, D)
+    x_expanded = x[:, :, None, :]  # Shape: (N, P_1, 1, D)
+    y_expanded = y[:, None, :, :]  # Shape: (N, 1, P_2, D)
+    cost_matrix = torch.sum((x_expanded - y_expanded) ** 2, dim=-1)  # Shape: (N, P_1, P_2)
+    cost_matrix /= cost_matrix.max()
+
+    return cost_matrix

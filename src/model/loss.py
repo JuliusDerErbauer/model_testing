@@ -1,6 +1,6 @@
 from torch import nn
 from pytorch3d.loss import chamfer_distance
-from model.sinkhorn import SinkhornDistance
+from model.sinkhorn import SinkhornDistance, compute_cost_matrix
 
 
 class ChamferLoss(nn.Module):
@@ -18,7 +18,8 @@ class EMDLoss(nn.Module):
         x = x.permute(0, 2, 1)
         y = y.permute(0, 2, 1)
         sinkhorn = SinkhornDistance(eps=1e-3, max_iter=200, reduction='mean')
-        dist, _, _ = sinkhorn(x, y)
+        C = compute_cost_matrix(x, y)
+        dist, _, _ = sinkhorn(x, y, C)
         return dist
 
 
