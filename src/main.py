@@ -141,7 +141,7 @@ def main():
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
     model.to(device)
-    criterion = LOSS()
+    criterion = LOSS
     optimizer = optim.Adam(model.parameters(), lr=LR)
     scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
     train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, criterion, TASK,
