@@ -15,8 +15,7 @@ from data_prerepration.noise_augmentation import NoiseAugmentation
 from model.simple_pointnet2_autoencoder import SimplePointnet2Autoencoder
 from model.pointnet_autoencoder import PCAutoEncoder
 from model.pointnet_simple import PointCloudAE
-
-from model.chamfer import ChamferLoss
+from model.loss import ChamferLoss, EMDLoss, CombinedLoss
 
 
 def lr_lambda(epoch):
@@ -39,7 +38,7 @@ NUM_POINTS_TRAIN = int(NUM_POINT_CLOUDS * (1 - SPLIT))
 NUM_POINTS_VAL = int(NUM_POINT_CLOUDS * SPLIT)
 TASK = reconstruction_task
 MODEL = PointCloudAE(1024, 128)
-LOSS = ChamferLoss
+LOSS = CombinedLoss([ChamferLoss(), EMDLoss()], [1, 1])
 LR = 0.0005
 LERNING_RATE = lr_lambda
 
